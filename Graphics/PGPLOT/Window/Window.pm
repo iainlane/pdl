@@ -2258,7 +2258,9 @@ use PDL::Graphics::PGPLOTOptions qw(default_options);
 use PDL::Slices;
 use PDL::NiceSlice;
 use SelfLoader;
-use PGPLOT;
+eval { require PGPLOT; PGPLOT->import(); 1 } or do {
+	warn "depedency on PGPLOT is not satisfied: $@";
+};
 
 require DynaLoader;
 
