@@ -85,12 +85,10 @@ sub new_viewport {
 
 	 $vp->transformer($cont);
     if(ref($ev)){
-		$ev->set_button(0,new PDL::Graphics::TriD::ArcCone(
-																			$vp, 0,
-																			$cont->{WRotation}));
-		$ev->set_button(2,new PDL::Graphics::TriD::SimpleScaler(
-																				  $vp,
-																				  \$cont->{CDistance}));
+		$ev->set_button(0,new PDL::Graphics::TriD::ArcCone( $vp, 0, $cont->{WRotation}));
+		$ev->set_button(2,new PDL::Graphics::TriD::SimpleScaler( $vp, \$cont->{CDistance}));
+                $ev->set_button(3,new PDL::Graphics::TriD::ScrollButtonScaler();
+                $ev->set_button(4,new PDL::Graphics::TriD::ScrollButtonScaler();
 
 		$vp->eventhandler($ev);
 	 }
