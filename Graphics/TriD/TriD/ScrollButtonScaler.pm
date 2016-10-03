@@ -22,12 +22,12 @@ sub new {
 
 sub ButtonRelease{
   my ($this,$x,$y) = @_;
+  $this->{Dist} *= $this->{Zoom};
   print "ButtonRelease @_\n"  if $PDL::Graphics::TriD::verbose;
 }
 
 sub ButtonPress{
   my ($this,$x,$y) = @_;
-
   print "ButtonPress @_ ",ref($this->{Win}),"\n" if $PDL::Graphics::TriD::verbose;
 }
 
