@@ -668,31 +668,33 @@ pp_def('map',
 
  ndims = map->ndims -1;
 
+#define ROUND16(a) ((((unsigned long) a) & 0xf == 0) ? (unsigned long) a : ((((unsigned long) a) + 15) & ~0xf))
+
  /*
   * Allocate all our dynamic workspaces at once
   * */
  ovec = (PDL_Indx *)(PDL->smalloc( (STRLEN)
-                                   ( + sizeof(PDL_Indx)    * 3 * ndims               // ovec, ivec, ibvec
-                                     + sizeof(PDL_Double) * (3*ndims)                // dvec, tvec
-                                     + sizeof(PDL_Double) * in->dims[ndims]          // acc
-                                     + sizeof(PDL_Double) * in->dims[ndims]          // wgt
-                                     + sizeof(PDL_Double) * in->dims[ndims]          // wgt2
-                                     + sizeof(PDL_Double) * 3 * ndims*ndims + ndims  // tmp (for PDL_xform_aux)
-                                     + sizeof(char) * ndims                          // bounds
-                                     + sizeof(PDL_Indx)   * ndims                    // index_stash
+                                   ( + ROUND16(sizeof(PDL_Indx)    * 3 * ndims)               // ovec, ivec, ibvec
+                                     + ROUND16(sizeof(PDL_Double) * (3*ndims))                // dvec, tvec
+                                     + ROUND16(sizeof(PDL_Double) * in->dims[ndims])          // acc
+                                     + ROUND16(sizeof(PDL_Double) * in->dims[ndims])          // wgt
+                                     + ROUND16(sizeof(PDL_Double) * in->dims[ndims])          // wgt2
+                                     + ROUND16(sizeof(PDL_Double) * 3 * ndims*ndims + ndims)  // tmp (for PDL_xform_aux)
+                                     + ROUND16(sizeof(char) * ndims)                          // bounds
+                                     + ROUND16(sizeof(PDL_Indx)   * ndims)                    // index_stash
                                      )
                                    )
                 );
- ivec   =                   &(ovec[ndims]);
- ibvec  =                   &(ivec[ndims]);
- dvec   =    (PDL_Double *)(&(ibvec[ndims]));
- tvec   =                   &(dvec[ndims]);
- acc    =                   &(tvec[ndims]);
- wgt    =                   &(acc[in->dims[ndims]]);  // weighting for accumulation
- wgt2   =                   &(wgt[in->dims[ndims]]);  // weighting for acc, if no bad values were found
- tmp    =                   &(wgt2[in->dims[ndims]]);
- bounds =          (char *)(&(tmp [3*ndims*ndims+ndims]));
- index_stash = (PDL_Indx *) &(bounds[ndims]);
+ ivec   =      (PDL_Indx *) ROUND16(&(ovec[ndims]));
+ ibvec  =      (PDL_Indx *) ROUND16(&(ivec[ndims]));
+ dvec   =    (PDL_Double *)(ROUND16(&(ibvec[ndims])));
+ tvec   =    (PDL_Double *) ROUND16(&(dvec[ndims]));
+ acc    =    (PDL_Double *) ROUND16(&(tvec[ndims]));
+ wgt    =    (PDL_Double *) ROUND16(&(acc[in->dims[ndims]]));
+ wgt2   =    (PDL_Double *) ROUND16(&(wgt[in->dims[ndims]]));
+ tmp    =    (PDL_Double *) ROUND16(&(wgt2[in->dims[ndims]]));
+ bounds =          (char *)(ROUND16(&(tmp [3*ndims*ndims+ndims])));
+ index_stash = (PDL_Indx *) ROUND16(&(bounds[ndims]));
 
 
 /***
